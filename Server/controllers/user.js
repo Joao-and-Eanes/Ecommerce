@@ -1,0 +1,112 @@
+const userModel = require('../models/user')
+const addressModel = require('../models/address')
+
+module.exports = class UserController {
+    static create( user ) {
+        this.#checkParam( user, 'object', 'create' )
+
+        try {
+            userModel.create( user )
+        } catch (err) {
+            throw err
+        }
+    }
+
+    static delete( userId ) {
+        this.#checkParam( userId, 'number', 'delete' )
+
+        try {
+            userModel.destroy({ where: { id: userId } })
+        } catch (err) {
+            throw err
+        }
+    }
+
+    static update( newData, userId ) {
+        this.#checkParam( newData, 'object', 'update' )
+        this.#checkParam( userId, 'number', 'update' )
+
+        try {
+            userModel.update( newData, { where: { id: userId } } )
+        } catch (err) {
+            
+        }
+    }
+
+    static async getUserById( userId ) {
+        this.#checkParam( userId, 'number', 'getUserById' )
+
+        try {
+            const option = { where: { id: userId }, include: { all: true } }
+
+            const user = (await userModel.findOne( option )).dataValues
+
+            this.#convertUser( user )
+
+            return user
+        } catch (err) {
+            throw err
+        }
+    }
+
+    static async getUserByWhere( where ) {
+        this.#checkParam( where, 'object', 'getUserByWhere' )
+
+        try {
+            const option = { where, include: { all: true } }
+
+            const user = (await userModel.findOne( option )).dataValues
+
+            this.#convertUser( user )
+
+            return user
+        } catch (err) {
+            throw err
+        }
+    }
+
+    static async getAllUser() {
+        const treatUser = elem => {
+            const newUser = elem.dataValues
+
+            this.#convertUser( newUser )
+
+            return newUser
+        }
+
+        try {
+            const option = { include: { all: true } }
+
+            const userRaw = await userModel.findAll( option ),
+                user = userRaw.map( treatUser )
+
+            return user
+        } catch (err) {
+            throw err
+        }
+    }
+
+    static async getAddress( userId ) {
+        this.#checkParam( userId, 'number', 'getAddress')
+
+        try {
+            const option = { where: { userId } }
+
+            const address = (await addressModel.findAll( option )).map( elem => elem.dataValues )
+
+            return address
+        } catch (err) {
+            throw err
+        }
+    }
+
+    static #checkParam( param, type, message ) {
+        if( typeof param === type ) return true
+
+        throw new Error(`Param inválids!. The error occurred in: ${ message }`)
+    }
+
+    static #convertUser( user ) {
+        user.addresses = user.addresses.map( elem => elem.dataValues )
+    }
+}
