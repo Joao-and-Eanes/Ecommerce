@@ -28,7 +28,7 @@ module.exports = class AddressController {
     }
 
     static update( newData, addressId ) {
-        this.#checkParam( newData, 'object', 'create' )
+        this.#checkParam( newData, 'object', 'update' )
         this.#checkParam( addressId, 'number', 'update' )
 
         try {

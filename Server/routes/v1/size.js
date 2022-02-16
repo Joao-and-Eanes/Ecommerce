@@ -1,4 +1,4 @@
-const addressController = require('../../controllers/address')
+const sizeController = require('../../controllers/size')
 
 const { Joi, Segments, celebrate } = require('celebrate')
 
@@ -11,13 +11,13 @@ module.exports = class AddressRouter {
             `/create`,
             celebrate({
                 [Segments.BODY]: Joi.object().keys({
-                    district: Joi.string().required(),
-                    complement: Joi.string().required(),
-                    state: Joi.string().required(),
-                    street: Joi.string().required(),
-                    cep: Joi.number().required(),
-                    number: Joi.number().required(),
-                    userId: Joi.number().required()
+                    size: Joi.string().required(),
+                    complement: Joi.number().integer().required(),
+                    shoulder: Joi.number().integer().required(),
+                    length: Joi.number().integer().required(),
+                    sleeve: Joi.number().integer().required(),
+                    bust: Joi.number().integer().required(),
+                    clotherId: Joi.number().integer().required()
                 })
             }),
                 this.#createRouter 
@@ -27,13 +27,12 @@ module.exports = class AddressRouter {
             `/update`,
             celebrate({
                 [Segments.BODY]: Joi.object().keys({
-                    district: Joi.string(),
-                    complement: Joi.string(),
-                    state: Joi.string(),
-                    street: Joi.string(),
-                    cep: Joi.number(),
-                    number: Joi.number(),
-                    addressId: Joi.number().required()
+                    size: Joi.string(),
+                    shoulder: Joi.number().integer(),
+                    length: Joi.number().integer(),
+                    sleeve: Joi.number().integer(),
+                    bust: Joi.number().integer(),
+                    sizeId: Joi.number().integer().required()
                 })
             }),
                 this.#updateRouter
@@ -43,7 +42,7 @@ module.exports = class AddressRouter {
             `/delete`,
             celebrate({
                 [Segments.BODY]: Joi.object().keys({
-                    addressId: Joi.number().required()
+                    addressId: Joi.number().integer().required()
                 })
             }),
             this.#deleteRouter
@@ -58,10 +57,10 @@ module.exports = class AddressRouter {
      * @param { Response } res 
      */
     static async #createRouter( req, res ) {
-        const { userId, ...address } = req.body
+        const { clotherId, ...size } = req.body
 
         try {
-            await addressController.create( address, userId )
+            await sizeController.create( size, clotherId )
 
             res.status( 200 ).send({ success: true })
         } catch (err) {
@@ -74,10 +73,10 @@ module.exports = class AddressRouter {
      * @param { Response } res 
      */
     static async #updateRouter( req, res ) {
-        const { addressId, ...address } = req.body
+        const { sizeId, ...size } = req.body
 
         try {
-            await addressController.update( address, addressId )
+            await sizeController.update( size, sizeId )
 
             res.status( 200 ).send({ success: true })
         } catch (err) {
@@ -90,10 +89,10 @@ module.exports = class AddressRouter {
      * @param { Response } res 
      */
     static async #deleteRouter( req, res ) {
-        const { addressId } = req.body
+        const { sizeId } = req.body
 
         try {
-            await addressController.delete( addressId )
+            await sizeController.delete( 1 )
 
             res.status( 200 ).send({ success: true })
         } catch (err) {
