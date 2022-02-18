@@ -1,4 +1,4 @@
-const sizeController = require('../../controllers/size')
+const assessmentController = require('../../controllers/assessment')
 
 const { Joi, Segments, celebrate } = require('celebrate')
 
@@ -11,12 +11,9 @@ module.exports = class AddressRouter {
             `/create`,
             celebrate({
                 [Segments.BODY]: Joi.object().keys({
-                    size: Joi.string().required(),
-                    complement: Joi.number().integer().required(),
-                    shoulder: Joi.number().integer().required(),
-                    length: Joi.number().integer().required(),
-                    sleeve: Joi.number().integer().required(),
-                    bust: Joi.number().integer().required(),
+                    coment: Joi.string().required(),
+                    assessment: Joi.number().integer().required(),
+                    userId: Joi.number().integer().required(),
                     clotherId: Joi.number().integer().required()
                 })
             }),
@@ -27,12 +24,9 @@ module.exports = class AddressRouter {
             `/update`,
             celebrate({
                 [Segments.BODY]: Joi.object().keys({
-                    size: Joi.string(),
-                    shoulder: Joi.number().integer(),
-                    length: Joi.number().integer(),
-                    sleeve: Joi.number().integer(),
-                    bust: Joi.number().integer(),
-                    sizeId: Joi.number().integer().required()
+                    coment: Joi.string(),
+                    assessment: Joi.number().integer(),
+                    assessmentId: Joi.number().integer().required()
                 })
             }),
                 this.#updateRouter
@@ -42,7 +36,7 @@ module.exports = class AddressRouter {
             `/delete`,
             celebrate({
                 [Segments.BODY]: Joi.object().keys({
-                    sizeId: Joi.number().integer().required()
+                    assessmentId: Joi.number().integer().required()
                 })
             }),
             this.#deleteRouter
@@ -57,10 +51,10 @@ module.exports = class AddressRouter {
      * @param { Response } res 
      */
     static async #createRouter( req, res ) {
-        const { clotherId, ...size } = req.body
+        const { clotherId, userId, ...assessment } = req.body
 
         try {
-            await sizeController.create( size, clotherId )
+            await assessmentController.create( assessment, userId, clotherId )
 
             res.status( 200 ).send({ success: true })
         } catch (err) {
@@ -73,10 +67,10 @@ module.exports = class AddressRouter {
      * @param { Response } res 
      */
     static async #updateRouter( req, res ) {
-        const { sizeId, ...size } = req.body
+        const { assessmentId, ...assessment } = req.body
 
         try {
-            await sizeController.update( size, sizeId )
+            await assessmentController.update( assessment, assessmentId )
 
             res.status( 200 ).send({ success: true })
         } catch (err) {
@@ -89,10 +83,10 @@ module.exports = class AddressRouter {
      * @param { Response } res 
      */
     static async #deleteRouter( req, res ) {
-        const { sizeId } = req.body
+        const { assessmentId } = req.body
 
         try {
-            await sizeController.delete( sizeId )
+            await assessmentController.delete( assessmentId )
 
             res.status( 200 ).send({ success: true })
         } catch (err) {
