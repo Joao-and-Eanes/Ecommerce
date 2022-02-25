@@ -19,11 +19,20 @@ const body = {
 
 const assessment = ecommerce.define( 'assessment', body, config )
 
-user.hasMany( assessment, { foreignKey: 'userId' } )
-assessment.belongsTo( user, { foreignKey: 'userId' })
+const optionUser = { 
+    foreignKey: 'userId',
+    constraints: true
+},
+    optionClother = { 
+        constraints: true,
+        foreignKey: 'clotherId'
+    } 
 
-clother.hasMany( clother, { foreignKey: 'clotherId' } )
-assessment.belongsTo( clother, { foreignKey: 'clotherId' } )
+assessment.belongsTo( user, optionUser )
+assessment.belongsTo( clother, optionUser )
+
+clother.hasMany( assessment, optionClother )
+user.hasMany( assessment, optionUser )
 
 // try {
 //     assessment.sync({ force: true })

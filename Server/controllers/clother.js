@@ -1,12 +1,18 @@
 const clotherModel = require('../models/clother')
 const sizeModel = require('../models/size')
+const assessmentModel = require('../models/assessment')
+
+const imageController = require('../utils/image')
+
+const { unlinkSync } = require('fs')
+const { join } = require('path')
 
 module.exports = class ClotherController {
     static create( clother ) {
         this.#checkParam( clother, 'object', 'create' )
 
         try {
-            clotherModel.create( clother )
+            clotherModel.create( { ...clother} )
         } catch (err) {
             throw err
         }
@@ -24,13 +30,42 @@ module.exports = class ClotherController {
         }
     }
 
-    static update( newData, clotherId ) {
+    static async update( newData, clotherId ) {
         this.#checkParam( newData, 'object', 'update' )
         this.#checkParam( clotherId, 'number', 'update' )
 
+        const checkUpdateImage = async keyImages => {
+            const changeImages = ( key, index ) => {
+                if( keyImages[ index ] ) {
+                    const path = join( __dirname, '..', 'uploads', 'images', key )
+
+                    unlinkSync( path )
+
+                    return keyImages[ index ]
+                }
+
+                return key
+            }
+
+            const oldImages = await this.#getArrayImagesByClotherId( clotherId ),
+                newImages = oldImages.map( changeImages )
+
+            return newImages
+        }
+
         try {
-            const option = { where: { id: clotherId }}
-            clotherModel.update( newData, option )
+            const option = { where: { id: clotherId }},
+                { images } = newData
+
+            const newClother = { ...newData }
+
+            if( newClother.images ) {
+                const newImages = await checkUpdateImage( images )
+
+                newClother.images = newImages
+            }
+            
+            clotherModel.update( newClother, option )
         } catch (err) {
             throw err
         }
@@ -40,11 +75,10 @@ module.exports = class ClotherController {
         this.#checkParam( clotherId, 'number', 'getClotherById' )
 
         try {
-            const option = { where: { id: clotherId },  include: sizeModel }
+            const option = { where: { id: clotherId },  include: { all: true } }
 
-            const clother = (await clotherModel.findOne( option )).dataValues
-
-            this.#treatClother( clother )
+            const clotherRaw = (await clotherModel.findOne( option )),
+                clother = this.#treatClother( clotherRaw )
 
             return clother
         } catch (err) {
@@ -56,11 +90,10 @@ module.exports = class ClotherController {
         this.#checkParam( where, 'object', 'getClotherByWhere' )
 
         try {
-            const option = { where, include: sizeModel }
+            const option = { where, include: { all: true } }
 
-            const clother = (await clotherModel.findOne( option )).dataValues
-
-            this.#treatClother( clother )
+            const clotherRaw = await clotherModel.findOne( option ),
+                clother = this.#treatClother( clotherRaw )
 
             return clother
         } catch (err) {
@@ -70,9 +103,23 @@ module.exports = class ClotherController {
 
     static async getAllClother() {
         try {
-            const option = { raw: true, nest: true }
+            const option = { subQuery: false, include: { all: true } }
 
-            const clother = await clotherModel.findAll( option )
+            const clotherRaw = await clotherModel.findAll( option ),
+                clother = this.#treatClother( clotherRaw )
+
+            return clother
+        } catch (err) {
+            throw err
+        }
+    }
+
+    static async getAllClotherByWhere( where ) {
+        try {
+            const option = { subQuery: false, include: { all: true }, where }
+
+            const clotherRaw = await clotherModel.findAll( option ),
+                clother = this.#treatClother( clotherRaw )
 
             return clother
         } catch (err) {
@@ -86,6 +133,14 @@ module.exports = class ClotherController {
         const sizes = (await this.getClotherById( clotherId )).sizes
 
         return sizes
+    }
+
+    static async getAllAssessments( clotherId ) {
+        this.#checkParam( clotherId, 'number', 'getAllSizes' )
+
+        const assessmets = (await this.getClotherById( clotherId )).assessments
+
+        return assessmets
     }
 
     static async getSizeLower( clotherId ) {
@@ -115,8 +170,60 @@ module.exports = class ClotherController {
         return sizeBig
     }
 
+    static async #getArrayImagesByClotherId( clotherId ) {
+        this.#checkParam( clotherId, 'number', 'getAllimagesByClotherId')
+
+        try {
+            const option = { where: { id: clotherId },  include: { all: true } }
+
+            const clotherRaw = (await clotherModel.findOne( option ))
+
+            const images = JSON.parse( clotherRaw.images )
+
+            return images 
+
+        } catch (err) {
+            throw err
+        }
+    }
+
     static #treatClother( clother ) {
-        clother.sizes = clother.sizes.map( elem => elem.dataValues )
+        const clotherIsArray = Array.isArray( clother )
+        
+        const getValue = elem => elem.dataValues,
+            treatArrayClothers = elem => {
+                const sizes = elem.sizes.map( getValue ),
+                    assessments = elem.assessments.map( getValue ),
+                    hasImages = elem.images && elem.images.length
+
+                if( hasImages ) {
+                    const images = imageController.getImagesByArray( elem.images )
+
+                    elem.images = images
+                }
+
+                elem.sizes = sizes
+                elem.assessments = assessments
+            }
+
+        if( clotherIsArray ) {
+            const newCLother = clother.map( getValue )
+
+            newCLother.forEach( treatArrayClothers )
+
+            return newCLother
+        }else{
+            const newClother = clother.dataValues
+            const sizes = newClother.sizes.map( getValue ),
+                images = imageController.getImagesByArray( newClother.images ),
+                assessments = newClother.assessments.map( getValue )
+            
+            newClother.sizes = sizes
+            newClother.images = images
+            newClother.assessments = assessments
+
+            return newClother
+        }
     }
 
     static #checkParam( param, type, message ) {

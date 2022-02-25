@@ -1,4 +1,4 @@
-const FsController = require('../functions/fs')
+const FsController = require('../utils/fs')
 
 module.exports = class RouterManeger {
     

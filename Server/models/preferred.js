@@ -13,16 +13,21 @@ const body = {
         allowNull: false
     },
     price: {
-        type: DataTypes.STRING,
+        type: DataTypes.DECIMAL,
         allowNull: false
     },
 },
-    option = { tableName: 'preferred' }
+    config = { tableName: 'preferred' }
 
-const preferred = ecommerce.define( 'preferred', body, option )
+const preferred = ecommerce.define( 'preferred', body, config )
 
-user.hasMany( preferred, { foreignKey: 'userId' } )
-preferred.belongsTo( user, { foreignKey: 'userId' } )
+const option = { 
+    constraints: true,
+    foreignKey: 'userId'
+}
+
+user.hasMany( preferred, option )
+preferred.belongsTo( user, option )
 
 // try {
 //     preferred.sync({ force: true })
