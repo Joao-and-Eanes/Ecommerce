@@ -1,14 +1,25 @@
 const assessmentModel = require('../models/assessment')
 const userModel = require('../models/user')
 
+const clotherController = require('../controllers/clother')
+
 module.exports = class AssessmentController {
-    static create( assessment, userId, clotherId ) {
+    static async create( assessment, userId, clotherId ) {
         this.#checkParam( assessment, 'object', 'create' )
         this.#checkParam( userId, 'number', 'create' )
         this.#checkParam( clotherId, 'number', 'create' )
 
         try {
-            assessmentModel.create( { ...assessment, userId, clotherId } )
+            const getAssessments = ( acu, elem ) => elem.assessment + acu
+
+            const assessmentOfClother = await clotherController.getAllAssessments( clotherId ),
+                sumTotalOfAssessment = assessmentOfClother.reduce( getAssessments, 0 ),
+                assessmentLength = assessmentOfClother.length,
+                avaregeRatings = sumTotalOfAssessment / assessmentLength <= 5 ? assessmentLength : 5
+            
+            await assessmentModel.create( { ...assessment, userId, clotherId } )
+
+            clotherController.update({ assessmentAverege: avaregeRatings }, clotherId )
         } catch (err) {
             throw err
         }
@@ -96,9 +107,10 @@ module.exports = class AssessmentController {
 
     static async getAllAssessment() {
         try {
-            const option = { raw: true, nest: true }
+            const option = { include: assessmentModel }
 
-            const assessment = await assessmentModel.findAll( option )
+            const clother = (await assessmentModel.findAll( option )).dataValues,
+                assessment = clother.assessment
 
             return assessment
         } catch (err) {

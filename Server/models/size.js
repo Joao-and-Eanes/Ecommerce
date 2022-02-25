@@ -9,19 +9,19 @@ const body = {
         allowNull: false
     },
     shoulder: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.DECIMAL,
         allowNull: false
     },
     length: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.DECIMAL,
         allowNull: false
     },
     sleeve: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.DECIMAL,
         allowNull: false
     },
     bust: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.DECIMAL,
         allowNull: false
     },
 },
@@ -31,10 +31,13 @@ const body = {
 
 const size = ecommerce.define( 'size', body, config )
 
-const option = { foreignKey: 'clotherId' }
+const option = { 
+    constraints: true,
+    foreignKey: 'clotherId'
+}
 
-clother.hasMany( size, option )
 size.belongsTo( clother, option )
+clother.hasMany( size, option )
 
 // try {
 //     size.sync({ force: true })

@@ -12,9 +12,25 @@ const body = {
         allowNull: false
     },
     price: {
+        type: DataTypes.DECIMAL,
+        allowNull: false
+    },
+    images: {
+        type: DataTypes.JSON,
+        allowNull: null
+    },
+    adult: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
+    sex: {
         type: DataTypes.STRING,
         allowNull: false
     },
+    assessmentAverege: {
+        type: DataTypes.DECIMAL,
+        defaultValue: 0
+    }
 },
     config = {
         tableName: 'clother'

@@ -65,7 +65,7 @@ module.exports = class AddressRouter {
 
             res.status( 200 ).send({ success: true })
         } catch (err) {
-            res.status( 500 ).send({ success: false })
+            res.status( 409 ).send({ success: false })
         }
     }
 
@@ -81,7 +81,7 @@ module.exports = class AddressRouter {
 
             res.status( 200 ).send({ success: true })
         } catch (err) {
-            res.status( 500 ).send({ success: false })
+            res.status( 409 ).send({ success: false })
         }
     }
 
@@ -97,7 +97,7 @@ module.exports = class AddressRouter {
 
             res.status( 200 ).send({ success: true })
         } catch (err) {
-            res.status( 500 ).send({ success: false })
+            res.status( 409 ).send({ success: false })
         }
     }
 }

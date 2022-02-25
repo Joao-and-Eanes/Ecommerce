@@ -5,10 +5,8 @@ module.exports = class SizeController {
         this.#checkParam( size, 'object', 'create' )
         this.#checkParam( clotherId, 'number', 'create' )
 
-        size.clotherId = clotherId
-
         try {
-            sizeModel.create( size )
+            sizeModel.create( { clotherId, ...size } )
         } catch (err) {
             throw err
         }
