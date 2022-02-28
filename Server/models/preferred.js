@@ -9,13 +9,17 @@ const body = {
         allowNull: false
     },
     imageKey: {
-        type: DataTypes.STRING,
+        type: DataTypes.JSON,
         allowNull: false
     },
     price: {
         type: DataTypes.DECIMAL,
         allowNull: false
     },
+    clotherId: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    }
 },
     config = { tableName: 'preferred' }
 

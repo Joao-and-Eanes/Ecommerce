@@ -1,8 +1,10 @@
-const assessmentController = require('../../controllers/assessment')
+const userControllers = require('../../controllers/user')
+
+const { createHash } = require('../../utils/bcrypt')
 
 const { Joi, Segments, celebrate } = require('celebrate')
 
-module.exports = class AssessmentRouter {
+module.exports = class UserRouter {
 
     static router() {
         const router = require('express').Router()
@@ -11,10 +13,11 @@ module.exports = class AssessmentRouter {
             `/create`,
             celebrate({
                 [Segments.BODY]: Joi.object().keys({
-                    coment: Joi.string().required(),
-                    assessment: Joi.number().integer().required(),
-                    userId: Joi.number().integer().required(),
-                    clotherId: Joi.number().integer().required()
+                    name: Joi.string().required(),
+                    email: Joi.string().required(),
+                    password: Joi.string().required(),
+                    tell: Joi.number().integer(),
+                    adm: Joi.boolean(),
                 })
             }),
                 this.#createRouter 
@@ -24,19 +27,22 @@ module.exports = class AssessmentRouter {
             `/update`,
             celebrate({
                 [Segments.BODY]: Joi.object().keys({
-                    coment: Joi.string(),
-                    assessment: Joi.number().integer(),
-                    assessmentId: Joi.number().integer().required()
+                    name: Joi.string(),
+                    email: Joi.string(),
+                    password: Joi.string(),
+                    tell: Joi.number(),
+                    adm: Joi.boolean(),
+                    userId: Joi.number().integer().required()
                 })
             }),
-                this.#updateRouter
+                this.#updateRouter 
         )
 
         router.post( 
             `/delete`,
             celebrate({
                 [Segments.BODY]: Joi.object().keys({
-                    assessmentId: Joi.number().integer().required()
+                    userId: Joi.number().integer().required()
                 })
             }),
             this.#deleteRouter
@@ -51,10 +57,12 @@ module.exports = class AssessmentRouter {
      * @param { Response } res 
      */
     static async #createRouter( req, res ) {
-        const { clotherId, userId, ...assessment } = req.body
+        const { password, ...user } = req.body
+
+        const passwordCrypt = createHash( password )
 
         try {
-            await assessmentController.create( assessment, userId, clotherId )
+            await userControllers.create({ password: passwordCrypt, ...user })
 
             res.status( 200 ).send({ success: true })
         } catch (err) {
@@ -62,15 +70,14 @@ module.exports = class AssessmentRouter {
         }
     }
 
-    /**
-     * @param { Request } req 
-     * @param { Response } res 
-     */
     static async #updateRouter( req, res ) {
-        const { assessmentId, ...assessment } = req.body
+        const { userId, password, ...data } = req.body,
+            newData = { ...data }
 
+        if( password ) newData.password = createHash( password )
+        
         try {
-            await assessmentController.update( assessment, assessmentId )
+            await userControllers.update( newData, userId )
 
             res.status( 200 ).send({ success: true })
         } catch (err) {
@@ -83,10 +90,10 @@ module.exports = class AssessmentRouter {
      * @param { Response } res 
      */
     static async #deleteRouter( req, res ) {
-        const { assessmentId } = req.body
+        const { userId } = req.body
 
         try {
-            await assessmentController.delete( assessmentId )
+            await userControllers.delete( userId )
 
             res.status( 200 ).send({ success: true })
         } catch (err) {

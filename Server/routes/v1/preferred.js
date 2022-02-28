@@ -3,7 +3,7 @@ const clotherController = require('../../controllers/clother')
 
 const { Joi, Segments, celebrate } = require('celebrate')
 
-module.exports = class AddressRouter {
+module.exports = class PreferredRouter {
 
     static router() {
         const router = require('express').Router()
