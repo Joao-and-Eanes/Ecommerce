@@ -19,4 +19,8 @@ module.exports = class ApiManeger {
         app.use( express.urlencoded({ extended: false }) )
         app.use( express.json() )
     }
+
+    static getPassport() {
+        return passport
+    }
 }

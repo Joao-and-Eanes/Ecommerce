@@ -2,7 +2,7 @@ const sizeController = require('../../controllers/size')
 
 const { Joi, Segments, celebrate } = require('celebrate')
 
-module.exports = class AddressRouter {
+module.exports = class SizeRouter {
 
     static router() {
         const router = require('express').Router()

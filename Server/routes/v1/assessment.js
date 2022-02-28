@@ -2,7 +2,7 @@ const assessmentController = require('../../controllers/assessment')
 
 const { Joi, Segments, celebrate } = require('celebrate')
 
-module.exports = class AddressRouter {
+module.exports = class AssessmentRouter {
 
     static router() {
         const router = require('express').Router()

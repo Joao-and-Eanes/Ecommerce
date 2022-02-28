@@ -4,7 +4,7 @@ const { createHash } = require('../../utils/bcrypt')
 
 const { Joi, Segments, celebrate } = require('celebrate')
 
-module.exports = class AddressRouter {
+module.exports = class UserRouter {
 
     static router() {
         const router = require('express').Router()

@@ -1,23 +1,12 @@
 const preferredModel = require('../models/preferred'),
     userModel = require('../models/user')
 
-const clotherController = require('../controllers/clother')
-
 module.exports = class PreferredController {
-    static async create( clotherId, userId ) {
-        this.#checkParam( clotherId, 'number', 'create' )
+    static async create( preferred, userId ) {
         this.#checkParam( userId, 'number', 'create' )
 
-        const { name, price } = await clotherController.getClotherById( clotherId ),
-            preferred = {
-                userId,
-                name,
-                price,
-                imageKey: '2'
-            }
-
         try {
-            preferredModel.create( preferred )
+            preferredModel.create({ userId, ...preferred })
         } catch (err) {
             throw err
         }

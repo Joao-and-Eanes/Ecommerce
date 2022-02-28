@@ -7,7 +7,7 @@ const { Joi, Segments, celebrate } = require('celebrate')
 const multer = require('multer'),
  upload = multer( configMulter )
 
-module.exports = class AddressRouter {
+module.exports = class ClotherRouter {
     
     static router() {
         const router = require('express').Router()

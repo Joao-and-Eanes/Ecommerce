@@ -1,6 +1,7 @@
 const userModel = require('../models/user')
 const addressModel = require('../models/address')
 const preferredModel = require('../models/preferred')
+const assessmentModel = require('../models/assessment')
 
 module.exports = class UserController {
     static create( user ) {
@@ -28,7 +29,9 @@ module.exports = class UserController {
         this.#checkParam( userId, 'number', 'update' )
 
         try {
-            userModel.update( newData, { where: { id: userId } } )
+            const option = { where: { id: userId } }
+
+            userModel.update( newData, option )
         } catch (err) {
             
         }
@@ -115,6 +118,20 @@ module.exports = class UserController {
         }
     }
 
+    static async getAssessment( userId ) {
+        this.#checkParam( userId, 'number', 'getAssessment')
+
+        try {
+            const option = { where: { userId } }
+
+            const assessment = (await assessmentModel.findAll( option )).map( elem => elem.dataValues )
+
+            return assessment
+        } catch (err) {
+            throw err
+        }
+    }
+
     static #checkParam( param, type, message ) {
         if( typeof param === type ) return true
 
@@ -127,5 +144,7 @@ module.exports = class UserController {
         user.addresses = user.addresses.map( cleanElem )
 
         user.preferreds = user.preferreds.map( cleanElem )
+
+        user.assessments = user.assessments.map( cleanElem )
     }
 }

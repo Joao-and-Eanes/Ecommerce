@@ -47,7 +47,7 @@ module.exports = class ClotherController {
                 return key
             }
 
-            const oldImages = await this.#getArrayImagesByClotherId( clotherId ),
+            const oldImages = await this.getArrayImagesByClotherId( clotherId ),
                 newImages = oldImages.map( changeImages )
 
             return newImages
@@ -170,7 +170,7 @@ module.exports = class ClotherController {
         return sizeBig
     }
 
-    static async #getArrayImagesByClotherId( clotherId ) {
+    static async getArrayImagesByClotherId( clotherId ) {
         this.#checkParam( clotherId, 'number', 'getAllimagesByClotherId')
 
         try {
