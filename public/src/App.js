@@ -1,11 +1,9 @@
-import { useState } from 'react'
-import axios from 'axios'
-
+import Header from './components/header'
 
 function App() {
-  
+
   return (
-  <h1>Hello world</h1>
+  <Header />
   );
 }
 
