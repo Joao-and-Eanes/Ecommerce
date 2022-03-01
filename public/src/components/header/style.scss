@@ -1,0 +1,50 @@
+@import "../../styles/variables";
+
+.header {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    padding: 12px 120px;
+    width: 100%;
+
+    border-bottom: 2px solid $gray_lighter;
+
+    .menu--header, .setting--header {
+        display: flex;
+    }
+
+    .setting--header {
+        display: flex;
+        gap: 16px;
+    }
+
+    .menu--header {
+        gap: 30px;
+        
+        list-style: none;
+
+        a {
+            text-decoration: none;
+            font-size: 1em;
+            font-weight: 800;
+
+            color: $gray_dark_bold;
+
+            cursor: pointer;
+            padding: 5px;
+        }
+    }
+
+    .container--header {
+        display: flex;
+        align-items: center;
+        gap: 22%;
+    }
+
+    .logo {
+        width: 144px;
+    }
+}
